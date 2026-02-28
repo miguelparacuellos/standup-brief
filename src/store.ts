@@ -1,6 +1,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import os from 'node:os';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export interface Task {
   id: string;
@@ -22,7 +24,7 @@ export interface StandupData {
   blockers: Blocker[];
 }
 
-const DATA_DIR = path.join(os.homedir(), '.standup');
+const DATA_DIR = path.join(__dirname, '..');
 const DATA_PATH = path.join(DATA_DIR, 'data.json');
 
 function getTodayISO(): string {
@@ -59,6 +61,5 @@ export function load(): StandupData {
 }
 
 export function save(data: StandupData): void {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
   fs.writeFileSync(DATA_PATH, JSON.stringify(data, null, 2));
 }
