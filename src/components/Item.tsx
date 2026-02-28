@@ -3,7 +3,7 @@ import { Box, Text } from 'ink';
 
 const ACCENT = '#4ade80';
 const TEXT_COLOR = '#e8e6e1';
-const MUTED = '#5a5a6a';
+const MUTED = '#8a8a9a';
 const WARNING = '#f59e0b';
 const DANGER = '#f87171';
 

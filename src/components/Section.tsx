@@ -5,8 +5,8 @@ import Item from './Item.js';
 import Input from './Input.js';
 
 const ACCENT = '#4ade80';
-const DIM = '#3a3a48';
-const MUTED = '#5a5a6a';
+const DIM = '#7a7a8a';
+const MUTED = '#8a8a9a';
 
 type SectionType = 'yesterday' | 'today' | 'blockers';
 

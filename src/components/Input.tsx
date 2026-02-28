@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Text } from 'ink';
 
 const ACCENT = '#4ade80';
-const MUTED = '#5a5a6a';
+const MUTED = '#8a8a9a';
 
 interface InputProps {
   value: string;

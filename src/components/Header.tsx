@@ -2,8 +2,8 @@ import React from 'react';
 import { Box, Text } from 'ink';
 
 const ACCENT = '#4ade80';
-const MUTED = '#5a5a6a';
-const DIM = '#3a3a48';
+const MUTED = '#8a8a9a';
+const DIM = '#4a4a58';
 
 export default function Header({ width }: { width: number }) {
   const now = new Date();
