@@ -10,6 +10,20 @@ import { useKeymap } from './hooks/useKeymap.js';
 type SectionName = 'yesterday' | 'today' | 'blockers';
 const SECTIONS: SectionName[] = ['yesterday', 'today', 'blockers'];
 
+function wordLeft(str: string, pos: number): number {
+  let i = pos - 1;
+  while (i > 0 && str[i] === ' ') i--;
+  while (i > 0 && str[i - 1] !== ' ') i--;
+  return i;
+}
+
+function wordRight(str: string, pos: number): number {
+  let i = pos;
+  while (i < str.length && str[i] === ' ') i++;
+  while (i < str.length && str[i] !== ' ') i++;
+  return i;
+}
+
 export default function App() {
   const { stdout } = useStdout();
   const width = stdout?.columns ?? 80;
@@ -25,6 +39,7 @@ export default function App() {
   const [mode, setMode] = useState<'navigation' | 'input' | 'delete-confirm'>('navigation');
   const [inputMode, setInputMode] = useState<'add' | 'edit' | null>(null);
   const [inputValue, setInputValue] = useState('');
+  const [cursorPos, setCursorPos] = useState(0);
   const [deleteConfirmIndex, setDeleteConfirmIndex] = useState<number | null>(null);
   const [newItemId, setNewItemId] = useState<string | null>(null);
   const [resolvingId, setResolvingId] = useState<string | null>(null);
@@ -98,6 +113,7 @@ export default function App() {
       setMode('input');
       setInputMode('add');
       setInputValue('');
+      setCursorPos(0);
     },
 
     onEdit: () => {
@@ -107,6 +123,7 @@ export default function App() {
       setMode('input');
       setInputMode('edit');
       setInputValue(item.text);
+      setCursorPos(item.text.length);
     },
 
     onDelete: () => {
@@ -141,11 +158,58 @@ export default function App() {
     },
 
     onInputChar: (ch: string) => {
-      setInputValue(prev => prev + ch);
+      setInputValue(prev => prev.slice(0, cursorPos) + ch + prev.slice(cursorPos));
+      setCursorPos(prev => prev + 1);
     },
 
     onInputBackspace: () => {
-      setInputValue(prev => prev.slice(0, -1));
+      if (cursorPos > 0) {
+        setInputValue(prev => prev.slice(0, cursorPos - 1) + prev.slice(cursorPos));
+        setCursorPos(prev => prev - 1);
+      }
+    },
+
+    onInputDelete: () => {
+      setInputValue(prev => prev.slice(0, cursorPos) + prev.slice(cursorPos + 1));
+    },
+
+    onInputDeleteWordBack: () => {
+      const newPos = wordLeft(inputValue, cursorPos);
+      setInputValue(prev => prev.slice(0, newPos) + prev.slice(cursorPos));
+      setCursorPos(newPos);
+    },
+
+    onInputDeleteToHome: () => {
+      setInputValue(prev => prev.slice(cursorPos));
+      setCursorPos(0);
+    },
+
+    onInputDeleteToEnd: () => {
+      setInputValue(prev => prev.slice(0, cursorPos));
+    },
+
+    onCursorLeft: () => {
+      setCursorPos(p => Math.max(0, p - 1));
+    },
+
+    onCursorRight: () => {
+      setCursorPos(p => Math.min(inputValue.length, p + 1));
+    },
+
+    onCursorWordLeft: () => {
+      setCursorPos(wordLeft(inputValue, cursorPos));
+    },
+
+    onCursorWordRight: () => {
+      setCursorPos(wordRight(inputValue, cursorPos));
+    },
+
+    onCursorHome: () => {
+      setCursorPos(0);
+    },
+
+    onCursorEnd: () => {
+      setCursorPos(inputValue.length);
     },
 
     onInputSubmit: () => {
@@ -154,6 +218,7 @@ export default function App() {
         setMode('navigation');
         setInputMode(null);
         setInputValue('');
+        setCursorPos(0);
         return;
       }
 
@@ -179,12 +244,14 @@ export default function App() {
       setMode('navigation');
       setInputMode(null);
       setInputValue('');
+      setCursorPos(0);
     },
 
     onCancel: () => {
       setMode('navigation');
       setInputMode(null);
       setInputValue('');
+      setCursorPos(0);
       setDeleteConfirmIndex(null);
     },
 
@@ -219,6 +286,7 @@ export default function App() {
         visible={visibleSections.yesterday}
         inputMode={activeSection === 'yesterday' ? inputMode : null}
         inputValue={inputValue}
+        cursorPos={cursorPos}
         deleteConfirmIndex={activeSection === 'yesterday' ? deleteConfirmIndex : null}
         newItemId={newItemId}
         resolvingId={null}
@@ -234,6 +302,7 @@ export default function App() {
         visible={visibleSections.today}
         inputMode={activeSection === 'today' ? inputMode : null}
         inputValue={inputValue}
+        cursorPos={cursorPos}
         deleteConfirmIndex={activeSection === 'today' ? deleteConfirmIndex : null}
         newItemId={newItemId}
         resolvingId={null}
@@ -249,6 +318,7 @@ export default function App() {
         visible={visibleSections.blockers}
         inputMode={activeSection === 'blockers' ? inputMode : null}
         inputValue={inputValue}
+        cursorPos={cursorPos}
         deleteConfirmIndex={activeSection === 'blockers' ? deleteConfirmIndex : null}
         newItemId={newItemId}
         resolvingId={resolvingId}

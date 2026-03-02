@@ -19,8 +19,18 @@ interface KeymapCallbacks {
   onCycleStatus: () => void;
   onInputChar: (ch: string) => void;
   onInputBackspace: () => void;
+  onInputDelete: () => void;
+  onInputDeleteWordBack: () => void;
+  onInputDeleteToHome: () => void;
+  onInputDeleteToEnd: () => void;
   onInputSubmit: () => void;
   onCancel: () => void;
+  onCursorLeft: () => void;
+  onCursorRight: () => void;
+  onCursorWordLeft: () => void;
+  onCursorWordRight: () => void;
+  onCursorHome: () => void;
+  onCursorEnd: () => void;
 }
 
 export function useKeymap(callbacks: KeymapCallbacks) {
@@ -38,10 +48,77 @@ export function useKeymap(callbacks: KeymapCallbacks) {
         callbacks.onCancel();
         return;
       }
+
+      // Backspace (key.backspace = \x08, key.delete = \x7f — both are backspace in Ink)
       if (key.backspace || key.delete) {
         callbacks.onInputBackspace();
         return;
       }
+
+      // ctrl+w — delete word backwards (option+backspace)
+      if (input === '\x17' || (input === 'w' && key.ctrl)) {
+        callbacks.onInputDeleteWordBack();
+        return;
+      }
+
+      // ctrl+u — delete to beginning of line (cmd+backspace)
+      if (input === '\x15' || (input === 'u' && key.ctrl)) {
+        callbacks.onInputDeleteToHome();
+        return;
+      }
+
+      // ctrl+k — delete to end of line
+      if (input === '\x0b' || (input === 'k' && key.ctrl)) {
+        callbacks.onInputDeleteToEnd();
+        return;
+      }
+
+      // ctrl+a — move to home (cmd+← in Terminal.app)
+      if (input === '\x01' || (input === 'a' && key.ctrl)) {
+        callbacks.onCursorHome();
+        return;
+      }
+
+      // ctrl+e — move to end (cmd+→ in Terminal.app)
+      if (input === '\x05' || (input === 'e' && key.ctrl)) {
+        callbacks.onCursorEnd();
+        return;
+      }
+
+      // Arrow key navigation
+      if (key.leftArrow) {
+        if (key.ctrl) {
+          callbacks.onCursorHome();
+        } else if (key.meta) {
+          callbacks.onCursorWordLeft();
+        } else {
+          callbacks.onCursorLeft();
+        }
+        return;
+      }
+      if (key.rightArrow) {
+        if (key.ctrl) {
+          callbacks.onCursorEnd();
+        } else if (key.meta) {
+          callbacks.onCursorWordRight();
+        } else {
+          callbacks.onCursorRight();
+        }
+        return;
+      }
+
+      // option+b / meta+b — word left (readline)
+      if (input === 'b' && key.meta) {
+        callbacks.onCursorWordLeft();
+        return;
+      }
+
+      // option+f / meta+f — word right (readline)
+      if (input === 'f' && key.meta) {
+        callbacks.onCursorWordRight();
+        return;
+      }
+
       if (input && !key.ctrl && !key.meta) {
         callbacks.onInputChar(input);
         return;

@@ -19,6 +19,7 @@ interface SectionProps {
   visible: boolean;
   inputMode: 'add' | 'edit' | null;
   inputValue: string;
+  cursorPos: number;
   deleteConfirmIndex: number | null;
   newItemId: string | null;
   resolvingId: string | null;
@@ -33,6 +34,7 @@ export default function Section({
   visible,
   inputMode,
   inputValue,
+  cursorPos,
   deleteConfirmIndex,
   newItemId,
   resolvingId,
@@ -57,11 +59,15 @@ export default function Section({
         const isResolving = item.id === resolvingId;
 
         if (isEditing) {
+          const before = inputValue.slice(0, cursorPos);
+          const atCursor = inputValue[cursorPos] ?? ' ';
+          const after = inputValue.slice(cursorPos + 1);
           return (
             <Box key={item.id} paddingLeft={2}>
               <Text color={ACCENT}>→ </Text>
-              <Text color={ACCENT}>{inputValue}</Text>
-              <Text color={ACCENT}>█</Text>
+              <Text color={ACCENT}>{before}</Text>
+              <Text color={ACCENT} inverse>{atCursor}</Text>
+              <Text color={ACCENT}>{after}</Text>
             </Box>
           );
         }
@@ -80,7 +86,7 @@ export default function Section({
         );
       })}
       {inputMode === 'add' && active ? (
-        <Input value={inputValue} placeholder={placeholder} />
+        <Input value={inputValue} placeholder={placeholder} cursorPos={cursorPos} />
       ) : (
         <Box paddingLeft={4}>
           <Text color={MUTED}>＋ {placeholder}</Text>
