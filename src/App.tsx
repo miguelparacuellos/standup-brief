@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Box, Text, useStdout } from 'ink';
 import { nanoid } from 'nanoid';
-import { load, save, type StandupData, type Task, type Blocker } from './store.js';
+import { load, save, type StandupData, type Task, type Blocker, type Status } from './store.js';
 import Header from './components/Header.js';
 import Section from './components/Section.js';
 import StatusBar from './components/StatusBar.js';
@@ -186,6 +186,19 @@ export default function App() {
       setInputMode(null);
       setInputValue('');
       setDeleteConfirmIndex(null);
+    },
+
+    onCycleStatus: () => {
+      if (currentItems.length === 0) return;
+      const item = currentItems[focusedIndex];
+      if (!item) return;
+      const cycle: Status[] = ['todo', 'progress', 'done'];
+      const current: Status = item.status ?? 'todo';
+      const nextStatus = cycle[(cycle.indexOf(current) + 1) % cycle.length]!;
+      const items = data[activeSection].map((it, i) =>
+        i === focusedIndex ? { ...it, status: nextStatus } : it
+      );
+      persist({ ...data, [activeSection]: items });
     },
   });
 

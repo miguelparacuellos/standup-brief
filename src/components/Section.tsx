@@ -75,6 +75,7 @@ export default function Section({
             isNew={isNew}
             deleteConfirm={isDeleting}
             resolved={isResolving}
+            status={item.status}
           />
         );
       })}

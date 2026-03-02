@@ -16,6 +16,7 @@ interface KeymapCallbacks {
   onDelete: () => void;
   onDeleteConfirm: () => void;
   onResolve: () => void;
+  onCycleStatus: () => void;
   onInputChar: (ch: string) => void;
   onInputBackspace: () => void;
   onInputSubmit: () => void;
@@ -96,6 +97,10 @@ export function useKeymap(callbacks: KeymapCallbacks) {
     }
     if (input === 'r' && callbacks.activeSection === 'blockers') {
       callbacks.onResolve();
+      return;
+    }
+    if (input === 's') {
+      callbacks.onCycleStatus();
       return;
     }
   });

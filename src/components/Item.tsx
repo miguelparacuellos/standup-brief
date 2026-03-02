@@ -1,11 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Text } from 'ink';
+import type { Status } from '../store.js';
 
 const ACCENT = '#4ade80';
 const TEXT_COLOR = '#e8e6e1';
 const MUTED = '#8a8a9a';
-const WARNING = '#f59e0b';
 const DANGER = '#f87171';
+
+const STATUS_ICONS: Record<Status, string> = {
+  todo: '○',
+  progress: '◐',
+  done: '●',
+};
 
 interface ItemProps {
   text: string;
@@ -14,6 +20,7 @@ interface ItemProps {
   isNew?: boolean;
   deleteConfirm?: boolean;
   resolved?: boolean;
+  status?: Status;
 }
 
 export default function Item({
@@ -23,6 +30,7 @@ export default function Item({
   isNew = false,
   deleteConfirm = false,
   resolved = false,
+  status,
 }: ItemProps) {
   const [highlight, setHighlight] = useState(isNew);
 
@@ -39,11 +47,8 @@ export default function Item({
     <Text>  </Text>
   );
 
-  const icon = sectionType === 'blockers' ? (
-    <Text color={WARNING}>⚠ </Text>
-  ) : (
-    <Text color={MUTED}>✓ </Text>
-  );
+  const effectiveStatus = status ?? 'todo';
+  const statusIcon = <Text color={MUTED}>{STATUS_ICONS[effectiveStatus]} </Text>;
 
   const dimText = sectionType === 'yesterday';
   const textColor = highlight ? ACCENT : resolved ? MUTED : dimText ? MUTED : TEXT_COLOR;
@@ -52,7 +57,7 @@ export default function Item({
     return (
       <Box paddingLeft={2}>
         {cursor}
-        {icon}
+        {statusIcon}
         <Text color={DANGER}>{text}  </Text>
         <Text color={DANGER} dimColor>[d again to confirm, esc to cancel]</Text>
       </Box>
@@ -63,7 +68,7 @@ export default function Item({
     return (
       <Box paddingLeft={2}>
         {cursor}
-        {icon}
+        {statusIcon}
         <Text color={MUTED} strikethrough>{text}</Text>
       </Box>
     );
@@ -72,7 +77,7 @@ export default function Item({
   return (
     <Box paddingLeft={2}>
       {cursor}
-      {icon}
+      {statusIcon}
       <Text color={textColor}>{text}</Text>
     </Box>
   );

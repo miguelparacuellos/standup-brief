@@ -4,10 +4,13 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+export type Status = 'todo' | 'progress' | 'done';
+
 export interface Task {
   id: string;
   text: string;
   createdAt: string;
+  status?: Status;
 }
 
 export interface Blocker {
@@ -15,6 +18,7 @@ export interface Blocker {
   text: string;
   createdAt: string;
   resolvedAt?: string;
+  status?: Status;
 }
 
 export interface StandupData {

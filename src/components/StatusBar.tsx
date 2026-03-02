@@ -41,7 +41,7 @@ export default function StatusBar({ mode, activeSection, width }: StatusBarProps
     <Box flexDirection="column" paddingX={2}>
       <Text color={DIM}>{divider}</Text>
       <Text color={MUTED}>
-        ↑↓ navigate · Tab section · a add · e edit · d delete{resolveHint} · q quit
+        ↑↓ navigate · Tab section · a add · e edit · d delete · s status{resolveHint} · q quit
       </Text>
     </Box>
   );
