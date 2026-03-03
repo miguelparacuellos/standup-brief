@@ -5,7 +5,7 @@ const MUTED = '#8a8a9a';
 const DIM = '#4a4a58';
 
 interface StatusBarProps {
-  mode: 'navigation' | 'input' | 'delete-confirm';
+  mode: 'navigation' | 'input' | 'delete-confirm' | 'move-confirm';
   activeSection: string;
   width: number;
 }
@@ -24,6 +24,17 @@ export default function StatusBar({ mode, activeSection, width }: StatusBarProps
     );
   }
 
+  if (mode === 'move-confirm') {
+    return (
+      <Box flexDirection="column" paddingX={2}>
+        <Text color={DIM}>{divider}</Text>
+        <Text color={MUTED}>
+          m confirm move to today · Esc cancel
+        </Text>
+      </Box>
+    );
+  }
+
   if (mode === 'delete-confirm') {
     return (
       <Box flexDirection="column" paddingX={2}>
@@ -36,12 +47,13 @@ export default function StatusBar({ mode, activeSection, width }: StatusBarProps
   }
 
   const resolveHint = activeSection === 'blockers' ? ' · r resolve blocker' : '';
+  const moveHint = activeSection === 'yesterday' ? ' · m move to today' : '';
 
   return (
     <Box flexDirection="column" paddingX={2}>
       <Text color={DIM}>{divider}</Text>
       <Text color={MUTED}>
-        ↑↓ navigate · Tab section · a add · e edit · d delete · s status{resolveHint} · q quit
+        ↑↓ navigate · Tab section · a add · e edit · d delete · s status{resolveHint}{moveHint} · q quit
       </Text>
     </Box>
   );

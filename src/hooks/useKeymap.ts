@@ -3,7 +3,7 @@ import { useInput, useApp } from 'ink';
 type SectionName = 'yesterday' | 'today' | 'blockers';
 
 interface KeymapCallbacks {
-  mode: 'navigation' | 'input' | 'delete-confirm';
+  mode: 'navigation' | 'input' | 'delete-confirm' | 'move-confirm';
   activeSection: SectionName;
   focusedIndex: number;
   sectionLengths: Record<SectionName, number>;
@@ -17,6 +17,8 @@ interface KeymapCallbacks {
   onDeleteConfirm: () => void;
   onResolve: () => void;
   onCycleStatus: () => void;
+  onMoveToToday: () => void;
+  onMoveConfirm: () => void;
   onInputChar: (ch: string) => void;
   onInputBackspace: () => void;
   onInputDelete: () => void;
@@ -138,6 +140,18 @@ export function useKeymap(callbacks: KeymapCallbacks) {
       return;
     }
 
+    if (mode === 'move-confirm') {
+      if (input === 'm') {
+        callbacks.onMoveConfirm();
+        return;
+      }
+      if (key.escape) {
+        callbacks.onCancel();
+        return;
+      }
+      return;
+    }
+
     // Navigation mode
     if (input === 'q' || (input === 'c' && key.ctrl)) {
       exit();
@@ -178,6 +192,10 @@ export function useKeymap(callbacks: KeymapCallbacks) {
     }
     if (input === 's') {
       callbacks.onCycleStatus();
+      return;
+    }
+    if (input === 'm' && callbacks.activeSection === 'yesterday') {
+      callbacks.onMoveToToday();
       return;
     }
   });

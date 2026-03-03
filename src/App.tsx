@@ -36,7 +36,7 @@ export default function App() {
 
   const [activeSection, setActiveSection] = useState<SectionName>('today');
   const [focusedIndex, setFocusedIndex] = useState(0);
-  const [mode, setMode] = useState<'navigation' | 'input' | 'delete-confirm'>('navigation');
+  const [mode, setMode] = useState<'navigation' | 'input' | 'delete-confirm' | 'move-confirm'>('navigation');
   const [inputMode, setInputMode] = useState<'add' | 'edit' | null>(null);
   const [inputValue, setInputValue] = useState('');
   const [cursorPos, setCursorPos] = useState(0);
@@ -255,6 +255,22 @@ export default function App() {
       setDeleteConfirmIndex(null);
     },
 
+    onMoveToToday: () => {
+      if (data.yesterday.length === 0) return;
+      setMode('move-confirm');
+    },
+
+    onMoveConfirm: () => {
+      const item = data.yesterday[focusedIndex];
+      if (!item) return;
+      const newYesterday = data.yesterday.filter((_, i) => i !== focusedIndex);
+      const newToday = [...data.today, { ...item }];
+      persist({ ...data, yesterday: newYesterday, today: newToday });
+      setFocusedIndex(Math.min(focusedIndex, Math.max(0, newYesterday.length - 1)));
+      setNewItemId(item.id);
+      setMode('navigation');
+    },
+
     onCycleStatus: () => {
       if (currentItems.length === 0) return;
       const item = currentItems[focusedIndex];
@@ -270,6 +286,7 @@ export default function App() {
   });
 
   const statusMode = mode === 'delete-confirm' ? 'delete-confirm' :
+    mode === 'move-confirm' ? 'move-confirm' :
     mode === 'input' ? 'input' : 'navigation';
 
   return (
