@@ -263,11 +263,18 @@ export default function App() {
     onMoveConfirm: () => {
       const item = data.yesterday[focusedIndex];
       if (!item) return;
-      const newYesterday = data.yesterday.filter((_, i) => i !== focusedIndex);
-      const newToday = [...data.today, { ...item }];
-      persist({ ...data, yesterday: newYesterday, today: newToday });
-      setFocusedIndex(Math.min(focusedIndex, Math.max(0, newYesterday.length - 1)));
-      setNewItemId(item.id);
+      if ((item.status ?? 'todo') === 'progress') {
+        const newItem = { ...item, id: nanoid() };
+        const newToday = [...data.today, newItem];
+        persist({ ...data, today: newToday });
+        setNewItemId(newItem.id);
+      } else {
+        const newYesterday = data.yesterday.filter((_, i) => i !== focusedIndex);
+        const newToday = [...data.today, { ...item }];
+        persist({ ...data, yesterday: newYesterday, today: newToday });
+        setFocusedIndex(Math.min(focusedIndex, Math.max(0, newYesterday.length - 1)));
+        setNewItemId(item.id);
+      }
       setMode('navigation');
     },
 

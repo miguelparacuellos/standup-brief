@@ -54,7 +54,7 @@ function applyRollover(data: StandupData): StandupData {
     lastWorkingDate: todayDate,
     yesterday: data.today,
     today: [],
-    blockers: data.blockers.filter(b => !b.resolvedAt),
+    blockers: data.blockers.filter(b => !b.resolvedAt && b.status !== 'done'),
   };
 }
 
